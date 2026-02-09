@@ -7,7 +7,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 import time
 import logging
 from .core.database import create_db_and_tables
-from .api import auth, todos
+from .api import auth, todos, chat, conversations
 
 
 # Configure logging
@@ -25,7 +25,7 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "Todo Backend Team",
-        "url": "https://github.com/your-repo",
+        "url": "https://github.com/Huzafi/Hackathon-2-Phase-II",
     },
     license_info={
         "name": "MIT",
@@ -46,6 +46,8 @@ app.add_middleware(
 # Register routers
 app.include_router(auth.router)
 app.include_router(todos.router)
+app.include_router(chat.router, prefix="/api")
+app.include_router(conversations.router, prefix="/api")
 
 
 # Request logging middleware

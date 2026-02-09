@@ -3,6 +3,9 @@ from sqlmodel import create_engine, Session, SQLModel
 from sqlalchemy.pool import NullPool
 from .config import settings
 
+# Import all models to register them with SQLModel metadata
+from ..models import User, Todo, Conversation, Message, ToolInvocation  # noqa: F401
+
 
 # Create engine with NullPool for serverless (Neon handles pooling)
 engine = create_engine(
@@ -17,7 +20,15 @@ engine = create_engine(
 
 
 def create_db_and_tables():
-    """Create all database tables. Idempotent operation."""
+    """Create all database tables. Idempotent operation.
+
+    Creates tables for:
+    - User: Authentication and ownership
+    - Todo: Task management
+    - Conversation: AI agent chat sessions
+    - Message: Conversation messages
+    - ToolInvocation: Audit log of tool executions
+    """
     SQLModel.metadata.create_all(engine)
 
 

@@ -5,6 +5,8 @@ from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .todo import Todo
+    from .conversation import Conversation
+    from .tool_invocation import ToolInvocation
 
 
 class User(SQLModel, table=True):
@@ -17,5 +19,7 @@ class User(SQLModel, table=True):
     hashed_password: str = Field(max_length=255, nullable=False)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
-    # Relationship to todos (one user has many todos)
+    # Relationships
     todos: List["Todo"] = Relationship(back_populates="user")
+    conversations: List["Conversation"] = Relationship(back_populates="user")
+    tool_invocations: List["ToolInvocation"] = Relationship(back_populates="user")

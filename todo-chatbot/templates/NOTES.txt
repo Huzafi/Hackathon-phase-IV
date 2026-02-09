@@ -1,0 +1,14 @@
+Your Todo Chatbot application has been deployed!
+
+To access your application:
+
+Frontend: http://{{ .Values.frontend.env.BETTER_AUTH_URL | replace "http://" "" | replace "https://" "" }}
+Backend API: http://{{ .Values.frontend.env.NEXT_PUBLIC_API_URL | replace "http://" "" | replace "https://" "" }}
+
+To check the status of your pods:
+  kubectl get pods --namespace {{ .Release.Namespace }}
+
+To view application logs:
+  Frontend: kubectl logs -l app.kubernetes.io/component=frontend --namespace {{ .Release.Namespace }}
+  Backend: kubectl logs -l app.kubernetes.io/component=backend --namespace {{ .Release.Namespace }}
+  Database: kubectl logs -l app.kubernetes.io/component=postgres --namespace {{ .Release.Namespace }}

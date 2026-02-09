@@ -1,0 +1,23 @@
+# Deployment values for Minikube
+# Generated for deployment
+
+backend:
+  env:
+    OPENAI_API_KEY: "your-openai-api-key-here"
+    JWT_SECRET: "your-jwt-secret-here"
+    OPENAI_MODEL: "gpt-4"
+    AGENT_TIMEOUT: "30"
+    CONTEXT_WINDOW_SIZE: "20"
+
+frontend:
+  env:
+    NEXT_PUBLIC_API_URL: "http://192.168.49.2:30800"
+    BETTER_AUTH_URL: "http://192.168.49.2:30300"
+    BETTER_AUTH_SECRET: "your-better-auth-secret-here"
+    JWT_SECRET: "your-jwt-secret-here"
+
+autoscaling:
+  enabled: false
+
+httpRoute:
+  enabled: false

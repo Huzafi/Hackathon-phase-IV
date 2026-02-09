@@ -1,0 +1,183 @@
+# Default values for todo-chatbot
+# This is a YAML-formatted file for local Minikube deployment
+
+# Global configuration
+global:
+  namespace: default
+
+# PostgreSQL Database Configuration
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  env:
+    POSTGRES_USER: todouser
+    POSTGRES_PASSWORD: todopassword
+    POSTGRES_DB: tododb
+
+  persistence:
+    enabled: true
+    storageClass: standard
+    size: 1Gi
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  healthcheck:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Backend API Configuration
+backend:
+  enabled: true
+  image:
+    repository: phase-iv-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30800
+
+  env:
+    DATABASE_URL: "postgresql://todouser:todopassword@todo-chatbot-postgres:5432/tododb?sslmode=disable"
+    JWT_SECRET: "your-secret-key-here-min-32-characters"
+    JWT_ALGORITHM: "HS256"
+    JWT_EXPIRATION_HOURS: "24"
+    OPENAI_API_KEY: ""
+    OPENAI_MODEL: "gpt-4"
+    AGENT_TIMEOUT: "30"
+    CONTEXT_WINDOW_SIZE: "20"
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 8000
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Frontend Application Configuration
+frontend:
+  enabled: true
+  image:
+    repository: phase-iv-frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30300
+
+  env:
+    NEXT_PUBLIC_API_URL: "http://localhost:30800"
+    BETTER_AUTH_SECRET: "Kf9sP3xR7L2Qm8ZB6D0NwA1E5JH4CYaV"
+    BETTER_AUTH_URL: "http://localhost:30300"
+    JWT_SECRET: "your-secret-key-here-min-32-characters"
+    JWT_ALGORITHM: "HS256"
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Service Account Configuration
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Pod Annotations and Labels
+podAnnotations: {}
+podLabels: {}
+
+# Security Context
+podSecurityContext: {}
+securityContext: {}
+
+# Ingress Configuration (disabled for local deployment)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: todo.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Autoscaling (disabled for local deployment)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+# Node Selector, Tolerations, and Affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
